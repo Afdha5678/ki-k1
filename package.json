@@ -1,0 +1,13 @@
+{
+  "name": "playfair-cipher-k1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplikasi web enkripsi/dekripsi Playfair Cipher - Tugas K1 Keamanan Informasi",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "report": "node tools/build-report.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.10.0"
+  }
+}

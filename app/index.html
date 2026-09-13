@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playfair Cipher: Enkripsi &amp; Dekripsi</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">PF</div>
+      <div>
+        <h1>Playfair Cipher</h1>
+        <p>Enkripsi &amp; dekripsi berkas teks dengan bujursangkar kunci 5×5</p>
+      </div>
+    </div>
+    <span class="course">KOM1314 Keamanan Informasi · Tugas K1</span>
+  </header>
+
+  <main class="layout">
+    <section class="main-col">
+      <!-- 1. Masukan -->
+      <div class="card" id="input-card">
+        <div class="card-head">
+          <h2><span class="num">1</span> Masukan</h2>
+          <div class="segmented" role="radiogroup" aria-label="Mode">
+            <label><input type="radio" name="mode" value="encrypt" checked><span>Enkripsi</span></label>
+            <label><input type="radio" name="mode" value="decrypt"><span>Dekripsi</span></label>
+          </div>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Kunci (kata / frasa)</span>
+          <input id="key" type="text" autocomplete="off" spellcheck="false" placeholder="contoh: KEAMANAN INFORMASI">
+        </label>
+
+        <div class="field">
+          <span class="field-label" id="file-label">Berkas plainteks (.txt)</span>
+          <label id="dropzone" class="dropzone">
+            <input id="file" type="file" accept=".txt,text/plain">
+            <span class="dz-icon" aria-hidden="true">⇪</span>
+            <span><strong>Pilih berkas</strong> atau seret &amp; lepas di sini</span>
+            <span id="file-name" class="file-name">Belum ada berkas dipilih</span>
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="field-label"><span id="text-label">Isi plainteks</span> <small>(bisa juga diketik atau diedit langsung)</small></span>
+          <textarea id="input" rows="7" spellcheck="false"></textarea>
+        </label>
+
+        <div class="options">
+          <label class="field compact">
+            <span class="field-label">Huruf sisipan</span>
+            <input id="filler" maxlength="1" value="X">
+          </label>
+          <label class="field compact grow">
+            <span class="field-label">Format keluaran</span>
+            <select id="grouping">
+              <option value="2">Per bigram (ZB RS FY …)</option>
+              <option value="5">Blok 5 huruf (ZBRSF YKUPG …)</option>
+              <option value="0">Tanpa spasi</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="error" class="alert" role="alert" hidden></div>
+
+        <div class="actions">
+          <button id="btn-process" class="btn primary" type="button">Enkripsi</button>
+          <button id="btn-sample" class="btn" type="button">Muat contoh slide</button>
+          <button id="btn-reset" class="btn ghost" type="button">Reset</button>
+          <span class="hint">Ctrl/⌘ + Enter</span>
+        </div>
+      </div>
+
+      <div id="results" hidden>
+        <!-- 2. Hasil -->
+        <div class="card">
+          <div class="card-head">
+            <h2><span class="num">2</span> <span id="output-title">Cipherteks</span></h2>
+            <div class="actions tight">
+              <button id="btn-copy" class="btn small" type="button">Salin</button>
+              <button id="btn-download" class="btn small primary" type="button">Unduh .txt</button>
+              <button id="btn-swap" class="btn small ghost" type="button">Gunakan sebagai masukan ⇄</button>
+            </div>
+          </div>
+          <div class="stats" id="stats"></div>
+          <textarea id="output" rows="6" readonly spellcheck="false"></textarea>
+          <div id="raw-wrap" class="raw" hidden>
+            <span class="field-label">Hasil mentah sebelum huruf sisipan dibuang</span>
+            <pre id="raw-output" class="mono-box"></pre>
+          </div>
+        </div>
+
+        <!-- 3. Pra-pemrosesan -->
+        <div class="card">
+          <div class="card-head"><h2><span class="num">3</span> Pra-pemrosesan</h2></div>
+          <ol class="prep" id="prep"></ol>
+        </div>
+
+        <!-- 4. Proses per bigram -->
+        <div class="card">
+          <div class="card-head">
+            <h2><span class="num">4</span> Proses per bigram</h2>
+            <span class="hint">Arahkan kursor ke baris untuk melihat posisinya di bujursangkar</span>
+          </div>
+          <div class="table-wrap">
+            <table class="steps">
+              <thead>
+                <tr><th>No</th><th>Bigram</th><th>Posisi (b,k)</th><th>Aturan</th><th>Posisi hasil</th><th>Hasil</th><th>Keterangan</th></tr>
+              </thead>
+              <tbody id="steps-body"></tbody>
+            </table>
+          </div>
+          <p id="table-note" class="hint" hidden></p>
+        </div>
+
+        <!-- 5. Frekuensi -->
+        <div class="card">
+          <div class="card-head">
+            <h2><span class="num">5</span> Frekuensi huruf</h2>
+            <div class="legend">
+              <span><i class="sw sw-in"></i><span id="legend-in">Plainteks</span></span>
+              <span><i class="sw sw-out"></i><span id="legend-out">Cipherteks</span></span>
+            </div>
+          </div>
+          <div class="histogram" id="histogram"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side-col">
+      <div class="card sticky">
+        <div class="card-head"><h2>Bujursangkar kunci</h2></div>
+        <div class="square" id="square" aria-label="Bujursangkar kunci 5x5"></div>
+        <p class="caption" id="hl-caption">&nbsp;</p>
+        <p class="key-info" id="key-info"></p>
+        <div class="rules">
+          <div class="rule"><i class="dot src"></i> Huruf bigram masukan</div>
+          <div class="rule"><i class="dot dst"></i> Huruf hasil</div>
+          <div class="rule"><i class="dot key"></i> Huruf dari kunci</div>
+        </div>
+        <details class="theory">
+          <summary>Aturan Playfair</summary>
+          <ol>
+            <li>Ganti J dengan I, buang karakter selain huruf.</li>
+            <li>Tulis pesan per bigram; huruf kembar disisipi X; jika ganjil, tambah X di akhir.</li>
+            <li><b>Baris sama:</b> geser ke kanan (dekripsi: kiri), siklik.</li>
+            <li><b>Kolom sama:</b> geser ke bawah (dekripsi: atas), siklik.</li>
+            <li><b>Lainnya:</b> ambil titik sudut persegi panjang pada baris masing-masing huruf.</li>
+          </ol>
+        </details>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">Playfair Cipher · Aplikasi web statis, seluruh proses berjalan di peramban (tanpa server).</footer>
+
+  <script src="playfair.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
