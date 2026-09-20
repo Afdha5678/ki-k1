@@ -1,13 +1,81 @@
 {
-  "nama": "Afdha Auliya Atiq",
-  "nim": "[ISI NIM]",
-  "kelas": "",
-  "dosen": "",
+  "kelompok": "Kelompok 3",
   "mataKuliah": "KOM1314 Keamanan Informasi",
   "institusi": [
     "DEPARTEMEN ILMU KOMPUTER",
-    "FAKULTAS MATEMATIKA DAN ILMU PENGETAHUAN ALAM",
+    "SEKOLAH SAINS DATA, MATEMATIKA, DAN INFORMATIKA",
     "IPB UNIVERSITY"
   ],
-  "tahun": "2026"
+  "tahun": "2026",
+  "github": "https://github.com/Afdha5678/ki-k1",
+  "deploy": "https://ki-k1-fw4qxggdu-afdha5678s-projects.vercel.app",
+  "anggota": [
+    {
+      "nama": "Afdha Auliya Atiq",
+      "nim": "M0403241163",
+      "bagian": "Pengembangan aplikasi",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Rendi Ramadana",
+      "nim": "M0403241141",
+      "bagian": "Penyusunan laporan",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Adzkia Muftia Rahman",
+      "nim": "M0403241153",
+      "bagian": "Penyusunan laporan",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Keyla Nurul Arafah",
+      "nim": "M0403241059",
+      "bagian": "Pengembangan aplikasi",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Muhammad Alif Baha Badiuzzaman",
+      "nim": "M0403241129",
+      "bagian": "Pengembangan aplikasi",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "M. Revandi Aridya Pohan",
+      "nim": "M0403241077",
+      "bagian": "Penyusunan laporan",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Nadine Putri Agustin",
+      "nim": "M0403241041",
+      "bagian": "Penyusunan laporan",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Naufal Indra Rizky",
+      "nim": "M0403241171",
+      "bagian": "Penyusunan laporan",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Jeslyn Angelica Widjaja",
+      "nim": "M0403241065",
+      "bagian": "Penyusunan laporan",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Quina Rizky Dae Yuena Siregar",
+      "nim": "G6401231013",
+      "bagian": "Penyusunan laporan",
+      "kontribusi": "9,09%"
+    },
+    {
+      "nama": "Nazwa Nadya Rahma",
+      "nim": "M0403241060",
+      "bagian": "Penyusunan laporan",
+      "kontribusi": "9,09%"
+    }
+  ],
+  "githubWeb": "https://github.com/estherrrrrrrrrrrrr/Playfair-Cipher"
 }

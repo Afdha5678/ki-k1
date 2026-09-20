@@ -82,7 +82,7 @@ async function captureApp(browser) {
     await page.evaluate(() => window.scrollTo(0, 0));
     await settle();
     const clip = await page.evaluate((a, b) => {
-      const layout = document.querySelector('.layout').getBoundingClientRect();
+      const layout = document.querySelector('.page').getBoundingClientRect();
       const top = document.querySelector(a).getBoundingClientRect().top;
       const bottom = document.querySelector(b).getBoundingClientRect().bottom;
       return { x: layout.left + 16, y: top + window.scrollY - 12, width: layout.width - 32, height: bottom - top + 24 };

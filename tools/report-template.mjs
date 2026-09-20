@@ -32,6 +32,9 @@ export function renderReport(d) {
   };
 
   const icLower = sample.ic.cipher < sample.ic.plain;
+  const members = id.anggota;
+  const timAplikasi = members.filter((m) => /aplikasi/i.test(m.bagian)).map((m) => esc(m.nama));
+  const timLaporan = members.filter((m) => !/aplikasi/i.test(m.bagian)).map((m) => esc(m.nama));
 
   return `<!doctype html>
 <html lang="id">
@@ -51,6 +54,7 @@ export function renderReport(d) {
   ul, ol { margin: 0 0 8px; padding-left: 22px; }
   li { margin-bottom: 2px; }
   .chapter { break-before: page; }
+  section.cover + section.chapter { break-before: auto; }
   code, pre, .mono { font-family: Menlo, Consolas, "Courier New", monospace; }
   code { font-size: 9.5pt; background: #f2f2f2; padding: 0 3px; border-radius: 2px; }
   pre { font-size: 8.4pt; line-height: 1.4; background: #f6f6f4; border: 1px solid #ddd; border-radius: 4px; padding: 8px 10px; white-space: pre-wrap; word-break: break-word; text-align: left; margin: 4px 0 10px; }
@@ -77,35 +81,35 @@ export function renderReport(d) {
   .flow span.ar { color: #555; }
   .box-note { break-inside: avoid; border-left: 3px solid #0f6e66; background: #f3f8f7; padding: 6px 10px; margin: 6px 0 10px; font-size: 10.5pt; }
 
-  /* Sampul */
-  .cover { height: 247mm; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: space-between; padding: 10mm 0 6mm; }
-  .cover .title { font-size: 17pt; font-weight: 700; line-height: 1.35; }
-  .cover .subtitle { font-size: 13pt; margin-top: 8px; }
-  .cover .logo { width: 150px; height: 150px; border: 3px solid #0f6e66; border-radius: 14px; display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px; gap: 3px; }
-  .cover .logo span { display: grid; place-items: center; font: 700 13pt Menlo, monospace; color: #0f6e66; background: #eef6f5; border-radius: 2px; }
-  .cover .logo span.k { background: #0f6e66; color: #fff; }
-  .cover .who { font-size: 12pt; line-height: 1.6; }
-  .cover .inst { font-size: 13pt; font-weight: 700; line-height: 1.45; }
+  /* Halaman 1 */
+  .cover { break-after: page; text-align: center; }
+  .cover .title { font-size: 16pt; font-weight: 700; line-height: 1.35; margin-top: 4mm; }
+  .cover .subtitle { font-size: 12.5pt; margin: 4px 0 12px; }
+  .cover .members-title { text-align: center; font-size: 13pt; margin: 14px 0 2px; }
+  .cover .members-note { text-align: center; font-size: 10pt; margin: 2px 0 6px; }
+  .cover table.members { font-size: 10.5pt; }
+  .cover table.members td, .cover table.members th { padding: 4px 7px; vertical-align: middle; }
+  .cover .inst { font-size: 12pt; font-weight: 700; line-height: 1.45; margin-top: 14mm; }
+  .nav-table td:first-child { white-space: nowrap; }
+  a { color: #0b4f8a; }
 </style>
 </head>
 <body>
 
-<!-- ======================= SAMPUL ======================= -->
+<!-- ======================= HALAMAN 1: ANGGOTA ======================= -->
 <section class="cover">
-  <div>
-    <div class="title">LAPORAN TUGAS K1<br>IMPLEMENTASI ENKRIPSI PLAYFAIR CIPHER</div>
-    <div class="subtitle">${esc(id.mataKuliah)}</div>
-  </div>
-  <div class="logo">${slide.grid
-    .flat()
-    .map((ch) => `<span class="${slide.keyLetters.includes(ch) ? 'k' : ''}">${ch}</span>`)
-    .join('')}</div>
-  <div class="who">
-    Disusun oleh:<br>
-    <b>${esc(id.nama)}</b><br>
-    NIM ${esc(id.nim)}${id.kelas ? `<br>Kelas ${esc(id.kelas)}` : ''}
-    ${id.dosen ? `<br><br>Dosen Pengampu:<br><b>${esc(id.dosen)}</b>` : ''}
-  </div>
+  <div class="title">LAPORAN TUGAS K1<br>IMPLEMENTASI ENKRIPSI PLAYFAIR CIPHER</div>
+  <div class="subtitle">${esc(id.mataKuliah)} · ${esc(id.kelompok)}</div>
+  <h2 class="members-title">Daftar Anggota Tim dan Pembagian Kerja</h2>
+  <p class="members-note">Beban kerja dibagi rata kepada seluruh anggota.</p>
+  <table class="full members">
+    <tr><th class="c" style="width:6%">No</th><th style="width:27%">Nama</th><th style="width:19%">NIM</th><th>Bagian Kerja</th><th class="c" style="width:15%">Kontribusi</th></tr>
+    ${members
+      .map((m, i) => `<tr><td class="c">${i + 1}</td><td><b>${esc(m.nama)}</b></td><td>${esc(m.nim)}</td><td>${esc(m.bagian)}</td><td class="c">${esc(m.kontribusi)}</td></tr>`)
+      .join('')}
+    <tr><th colspan="4" style="text-align:right">Total</th><th class="c">100%</th></tr>
+  </table>
+  <p class="members-note">Pengembangan aplikasi: ${timAplikasi.join(', ')}.<br>Penyusunan laporan: ${timLaporan.join(', ')}.</p>
   <div class="inst">${id.institusi.map(esc).join('<br>')}<br>${esc(id.tahun)}</div>
 </section>
 
@@ -142,6 +146,19 @@ ${tcap('Spesifikasi aplikasi dan pemenuhannya')}
   <li>Karakter selain huruf (spasi, angka, tanda baca) dibuang pada tahap pra-pemrosesan, sebagaimana Playfair klasik.</li>
   <li>Selain enkripsi, aplikasi juga menyediakan dekripsi untuk memverifikasi bahwa cipherteks dapat dikembalikan.</li>
 </ul>
+
+<h2>1.5 Deskripsi Aplikasi</h2>
+<p><b>Playfair Cipher</b> adalah aplikasi web yang dibuat Kelompok 3 untuk mengenkripsi dan mendekripsi berkas teks menggunakan algoritma Playfair cipher. Pengguna cukup memilih berkas <code>.txt</code> berisi teks asli dan mengetik kata/frasa kunci. Aplikasi lalu menyusun bujursangkar kunci 5×5, memproses teks per bigram, dan menghasilkan cipherteks yang dapat disalin atau diunduh sebagai berkas teks.</p>
+<p>Aplikasi berjalan sepenuhnya di peramban tanpa server, sehingga isi berkas tidak dikirim ke mana pun. Selain hasil akhir, aplikasi menampilkan langkah-langkah prosesnya (normalisasi, pembentukan bigram, aturan yang dipakai tiap bigram, dan posisi huruf pada bujursangkar) serta grafik frekuensi huruf, sehingga cara kerja Playfair cipher dapat dipelajari secara visual. Aplikasi dapat diakses di <a href="${esc(id.deploy)}">${esc(id.deploy)}</a>.</p>
+${tcap('Ringkasan aplikasi')}
+<table class="full">
+  <tr><th style="width:26%">Aspek</th><th>Keterangan</th></tr>
+  <tr><td>Jenis</td><td>Aplikasi web statis (HTML, CSS, JavaScript), dapat dibuka di Chrome, Edge, Firefox, atau Safari</td></tr>
+  <tr><td>Masukan</td><td>Berkas teks asli (<code>.txt</code>) atau teks yang diketik, serta kata/frasa kunci</td></tr>
+  <tr><td>Keluaran</td><td>Cipherteks/plainteks yang dapat disalin dan diunduh sebagai <code>.txt</code></td></tr>
+  <tr><td>Mode</td><td>Enkripsi dan dekripsi</td></tr>
+  <tr><td>Fitur pendukung</td><td>Bujursangkar kunci langsung, rincian proses per bigram, histogram frekuensi, contoh dari materi kuliah, validasi masukan</td></tr>
+</table>
 </section>
 
 <!-- ======================= BAB II ======================= -->
@@ -210,18 +227,28 @@ ${squareTable(slide.grid, slide.keyLetters)}
 ├── tools/                  skrip pembuat laporan PDF
 └── laporan/                laporan HTML/PDF dan screenshot</pre>
 
-<h2>3.3 Alur Program</h2>
+<h2>3.3 Alur Kerja Aplikasi</h2>
 <div class="flow">
+  <span class="box">Buka<br>aplikasi</span><span class="ar">→</span>
   <span class="box">Pilih mode<br>(Enkripsi/Dekripsi)</span><span class="ar">→</span>
-  <span class="box">Masukkan<br>kunci</span><span class="ar">→</span>
-  <span class="box">Bentuk<br>bujursangkar 5×5</span><span class="ar">→</span>
+  <span class="box">Ketik kunci →<br>bujursangkar 5×5</span><span class="ar">→</span>
   <span class="box">Pilih berkas<br>.txt</span><span class="ar">→</span>
-  <span class="box">Validasi<br>masukan</span><span class="ar">→</span>
+  <span class="box">Klik proses<br>&amp; validasi</span><span class="ar">→</span>
   <span class="box">Normalisasi &amp;<br>bentuk bigram</span><span class="ar">→</span>
   <span class="box">Transformasi<br>tiap bigram</span><span class="ar">→</span>
-  <span class="box">Tampilkan &amp;<br>unduh hasil</span>
+  <span class="box">Tampilkan, salin,<br>unduh hasil</span>
 </div>
-<p>Modul inti <code>playfair.js</code> dipisahkan dari antarmuka (<code>app.js</code>) sehingga fungsi yang sama dapat diuji langsung melalui Node.js. Setiap fungsi enkripsi/dekripsi mengembalikan hasil akhir sekaligus rincian langkah per bigram (posisi asal, aturan, posisi hasil) yang ditampilkan pada antarmuka.</p>
+<ol>
+  <li><b>Membuka aplikasi.</b> Pengguna membuka <code>app/index.html</code> atau alamat Vercel. Halaman berisi panel masukan di kiri dan bujursangkar kunci di kanan.</li>
+  <li><b>Memilih mode.</b> Tombol <i>Enkripsi</i> atau <i>Dekripsi</i> menentukan proses yang dijalankan dan label berkas masukan.</li>
+  <li><b>Memasukkan kunci.</b> Setiap huruf yang diketik langsung memperbarui bujursangkar 5×5: huruf unik kunci ditulis lebih dulu, J diganti I, lalu sisa alfabet.</li>
+  <li><b>Memilih berkas teks.</b> Berkas <code>.txt</code> dipilih atau diseret ke area unggah, lalu dibaca oleh <code>FileReader</code> dan isinya ditampilkan di kolom teks.</li>
+  <li><b>Memproses.</b> Tombol proses (atau Ctrl/⌘ + Enter) memvalidasi masukan. Kunci kosong, teks kosong, atau cipherteks tidak valid ditolak dengan pesan kesalahan.</li>
+  <li><b>Pra-pemrosesan.</b> Untuk enkripsi, teks dinormalisasi (huruf kapital, J → I, karakter non-huruf dibuang) lalu dipecah menjadi bigram dengan sisipan X. Untuk dekripsi, cipherteks dipecah per dua huruf.</li>
+  <li><b>Transformasi.</b> Setiap bigram diproses dengan aturan baris sama, kolom sama, atau persegi panjang.</li>
+  <li><b>Menampilkan hasil.</b> Hasil, statistik, daftar bigram, tabel langkah, dan histogram frekuensi ditampilkan. Pengguna dapat menyalin, mengunduh <code>.txt</code>, atau langsung memakai hasil sebagai masukan mode sebaliknya.</li>
+</ol>
+<p>Secara teknis, modul inti <code>playfair.js</code> dipisahkan dari antarmuka (<code>app.js</code>) sehingga fungsi yang sama dapat diuji langsung melalui Node.js. Setiap fungsi enkripsi/dekripsi mengembalikan hasil akhir sekaligus rincian langkah per bigram (posisi asal, aturan, posisi hasil) yang ditampilkan pada antarmuka.</p>
 
 <h2>3.4 Implementasi Modul Inti</h2>
 <h3>3.4.1 Normalisasi dan Bujursangkar Kunci</h3>
@@ -258,9 +285,21 @@ ${tcap('Fitur aplikasi')}
 <section class="chapter">
 <h1>BAB IV<small>HASIL DAN PENGUJIAN</small></h1>
 
-<h2>4.1 Tampilan Program</h2>
-<p>Aplikasi dijalankan dengan membuka berkas <code>app/index.html</code> pada peramban. Halaman terdiri atas kolom utama (masukan dan hasil) serta panel samping yang menampilkan bujursangkar kunci.</p>
-${fig('01-tampilan-awal')}
+<h2>4.1 Navigasi Aplikasi</h2>
+<p>Aplikasi terdiri atas satu halaman yang dibaca dari atas ke bawah. Tabel berikut merangkum setiap bagian yang dilalui pengguna beserta gambar yang menjelaskannya pada bab ini.</p>
+${tcap('Bagian navigasi aplikasi')}
+<table class="full nav-table">
+  <tr><th style="width:30%">Bagian</th><th>Fungsi</th><th class="c" style="width:14%">Gambar</th></tr>
+  <tr><td>Halaman awal</td><td>Panel masukan, pilihan mode, dan bujursangkar kunci kosong</td><td class="c">1</td></tr>
+  <tr><td>1. Masukan</td><td>Mode, kunci, unggah berkas, huruf sisipan, format keluaran, tombol proses</td><td class="c">2, 7</td></tr>
+  <tr><td>2. Cipherteks / Plainteks</td><td>Hasil, statistik, tombol Salin, Unduh .txt, dan Gunakan sebagai masukan</td><td class="c">3, 8</td></tr>
+  <tr><td>3. Pra-pemrosesan</td><td>Teks ternormalisasi dan daftar bigram</td><td class="c">4</td></tr>
+  <tr><td>4. Proses per bigram</td><td>Tabel posisi dan aturan tiap bigram, disorot di bujursangkar</td><td class="c">5</td></tr>
+  <tr><td>5. Frekuensi huruf</td><td>Histogram frekuensi plainteks dan cipherteks</td><td class="c">6</td></tr>
+  <tr><td>Muat contoh</td><td>Memuat contoh materi kuliah secara otomatis</td><td class="c">9</td></tr>
+  <tr><td>Pesan kesalahan</td><td>Peringatan jika masukan tidak valid</td><td class="c">10</td></tr>
+</table>
+${fig('01-tampilan-awal', 'Saat pertama dibuka, pengguna melihat kartu <b>1 Masukan</b> berisi tombol mode Enkripsi/Dekripsi, kolom kunci, area unggah berkas, kolom teks, pilihan huruf sisipan dan format keluaran, serta tombol <b>Enkripsi</b>, <b>Muat contoh slide</b>, dan <b>Reset</b>. Panel kanan menampilkan bujursangkar kunci beserta keterangan warna dan ringkasan aturan Playfair.')}
 
 <h2>4.2 Pengujian Enkripsi Berkas Teks</h2>
 <p>Pengujian menggunakan berkas <code>${esc(sample.files.plain)}</code> dan kunci <code>${esc(sample.key)}</code>. Isi berkas teks asli adalah sebagai berikut.</p>
@@ -269,8 +308,8 @@ ${fig('02-input-enkripsi', 'Setelah kunci diketik, panel samping langsung menamp
 ${tcap(`Bujursangkar kunci "${esc(sample.key)}"`)}
 ${squareTable(sample.grid, sample.keyLetters)}
 ${fig('03-hasil-enkripsi', `Proses enkripsi menghasilkan ${sample.stats.bigrams} bigram dari ${sample.stats.letters} huruf, dengan ${sample.stats.fillers} huruf sisipan. Distribusi aturan: ${sample.stats.rules.baris} baris sama, ${sample.stats.rules.kolom} kolom sama, dan ${sample.stats.rules.persegi} persegi panjang.`)}
-${fig('04-prapemrosesan')}
-${fig('05-proses-bigram')}
+${fig('04-prapemrosesan', 'Kartu <b>3 Pra-pemrosesan</b> menunjukkan teks setelah dinormalisasi dan daftar bigram. Bigram yang mendapat huruf sisipan diberi warna jingga dan huruf sisipannya digarisbawahi.')}
+${fig('05-proses-bigram', 'Kartu <b>4 Proses per bigram</b> berisi tabel nomor, bigram, posisi (baris, kolom), aturan, posisi hasil, dan hasil. Saat kursor diarahkan ke suatu baris, huruf masukan (hijau) dan huruf hasil (jingga) disorot pada bujursangkar kunci di panel kanan.')}
 ${tcap('Dua belas langkah pertama enkripsi berkas contoh')}
 <table class="full">
   <tr><th class="c">No</th><th class="c">Bigram</th><th>Posisi (b,k)</th><th>Aturan</th><th>Posisi hasil</th><th class="c">Hasil</th></tr>
@@ -290,7 +329,7 @@ ${
 <p>Berkas hasil enkripsi yang diunduh dari aplikasi (<code>${esc(sample.files.cipher)}</code>) berisi cipherteks berikut.</p>
 <pre class="cipher">${esc(sample.cipherFile)}</pre>
 <div class="box-note">Isi berkas unduhan dibandingkan dengan keluaran fungsi <code>encrypt</code> yang dijalankan terpisah di Node.js: <span class="${sample.cipherMatchesLibrary ? 'ok' : 'bad'}">${sample.cipherMatchesLibrary ? 'identik' : 'TIDAK identik'}</span>.</div>
-${fig('06-frekuensi')}
+${fig('06-frekuensi', 'Kartu <b>5 Frekuensi huruf</b> membandingkan jumlah kemunculan setiap huruf A–Z pada plainteks (abu-abu) dan cipherteks (hijau).')}
 <p>Nilai <i>index of coincidence</i> (IC) plainteks adalah ${num(sample.ic.plain)} sedangkan cipherteks ${num(sample.ic.cipher)}. Huruf terbanyak pada plainteks adalah ${sample.top.plain
     .map((t) => `${t.ch} (${num(t.pct, 1)}%)`)
     .join(', ')}; pada cipherteks ${sample.top.cipher.map((t) => `${t.ch} (${num(t.pct, 1)}%)`).join(', ')}. ${
@@ -301,8 +340,8 @@ ${fig('06-frekuensi')}
 
 <h2>4.3 Pengujian Dekripsi</h2>
 <p>Untuk memastikan cipherteks dapat dikembalikan, berkas <code>${esc(sample.files.cipher)}</code> didekripsi kembali dengan kunci yang sama.</p>
-${fig('07-input-dekripsi')}
-${fig('08-hasil-dekripsi')}
+${fig('07-input-dekripsi', 'Untuk dekripsi, pengguna menekan tombol <b>Dekripsi</b> di kanan atas kartu masukan. Label berubah menjadi berkas cipherteks, lalu berkas hasil enkripsi dipilih dan kunci yang sama diketik.')}
+${fig('08-hasil-dekripsi', 'Hasil dekripsi ditampilkan tanpa spasi. Di bawahnya terdapat hasil mentah per bigram sebelum huruf sisipan X dibuang, sehingga pengguna dapat memeriksa X yang dihapus.')}
 <p>Isi berkas hasil dekripsi (<code>${esc(sample.files.decrypted)}</code>):</p>
 <pre class="cipher">${esc(sample.decryptedFile)}</pre>
 ${tcap('Hasil verifikasi dekripsi')}
@@ -315,8 +354,8 @@ ${sample.decryptedEqualsPlain ? '' : '<p>*Perbedaan disebabkan heuristik pembuan
 <p>Perlu dicatat bahwa hasil dekripsi tidak memuat spasi, tanda baca, dan huruf J, karena informasi tersebut memang dihilangkan pada tahap pra-pemrosesan Playfair cipher.</p>
 
 <h2>4.4 Verifikasi terhadap Contoh Materi Kuliah</h2>
-<p>Implementasi diuji menggunakan contoh pada materi kuliah: plainteks <code>${esc(slide.plaintext)}</code> dengan bujursangkar pada Tabel 2. Tombol <b>Muat contoh slide</b> pada aplikasi memuat contoh ini secara otomatis.</p>
-${fig('09-contoh-slide')}
+<p>Implementasi diuji menggunakan contoh pada materi kuliah: plainteks <code>${esc(slide.plaintext)}</code> dengan bujursangkar pada Tabel 2. Tombol <b>Muat contoh</b> pada aplikasi memuat contoh ini secara otomatis.</p>
+${fig('09-contoh-slide', 'Tombol <b>Muat contoh</b> mengisi kunci ALNGESHPUB dan plainteks dari materi kuliah, lalu langsung menjalankan enkripsi.')}
 ${tcap('Perbandingan hasil aplikasi dengan contoh materi kuliah')}
 <table>
   <tr><th class="c">No</th><th class="c">Bigram</th><th>Aturan</th><th class="c">Hasil aplikasi</th><th class="c">Hasil pada slide</th><th class="c">Status</th></tr>
@@ -345,6 +384,7 @@ ${tcap('Daftar kasus unit test')}
 <!-- ======================= BAB V ======================= -->
 <section class="chapter">
 <h1>BAB V<small>KESIMPULAN</small></h1>
+<h2>5.1 Kesimpulan</h2>
 <ol>
   <li>Playfair cipher berhasil diimplementasikan sebagai aplikasi web yang menerima berkas teks asli dan kata/frasa kunci, lalu menghasilkan cipherteks yang dapat disalin maupun diunduh sebagai berkas teks.</li>
   <li>Implementasi mengikuti aturan pada materi kuliah: bujursangkar 5×5 tanpa J, penyisipan X pada huruf kembar dan jumlah ganjil, serta aturan baris, kolom, dan persegi panjang. Hasil enkripsi contoh <code>${esc(slide.plaintext)}</code> ${slide.match ? 'sama persis' : 'dibandingkan'} dengan slide (<code>${slide.expected}</code>).</li>
@@ -352,17 +392,23 @@ ${tcap('Daftar kasus unit test')}
   <li>Rincian proses per bigram dan sorotan pada bujursangkar kunci membantu memahami cara kerja algoritma. Analisis frekuensi memperlihatkan bahwa Playfair menyamarkan frekuensi huruf tunggal, tetapi karena blok hanya dua huruf, cipher ini tetap rentan terhadap analisis frekuensi bigram dan tidak layak dipakai untuk pengamanan data modern.</li>
 </ol>
 
-<h2>Lampiran A. Cara Menjalankan Aplikasi</h2>
+<h2>5.2 Kode Sumber dan Akses Aplikasi</h2>
+${tcap('Tautan kode sumber dan aplikasi')}
+<table class="full">
+  <tr><th style="width:28%">Keterangan</th><th>Tautan</th></tr>
+  <tr><td>Kode sumber aplikasi (GitHub)</td><td><a href="${esc(id.githubWeb)}">${esc(id.githubWeb)}</a></td></tr>
+  <tr><td>Repositori kelompok: aplikasi, berkas contoh, pengujian, dan laporan (GitHub)</td><td><a href="${esc(id.github)}">${esc(id.github)}</a></td></tr>
+  <tr><td>Aplikasi daring (Vercel)</td><td><a href="${esc(id.deploy)}">${esc(id.deploy)}</a></td></tr>
+</table>
+<p>Repositori berisi kode aplikasi (<code>app/</code>), berkas contoh plainteks beserta hasil enkripsi dan dekripsinya (<code>samples/</code>), unit test (<code>tests/</code>), serta skrip pembuat laporan (<code>tools/</code>).</p>
+<p>Cara menjalankan aplikasi:</p>
 <ol>
-  <li>Buka berkas <code>app/index.html</code> menggunakan peramban modern (Chrome, Edge, Firefox, atau Safari). Tidak diperlukan instalasi maupun server.</li>
+  <li>Buka tautan Vercel di atas, atau unduh repositori lalu buka <code>app/index.html</code> di peramban. Tidak diperlukan instalasi maupun server.</li>
   <li>Pilih mode <b>Enkripsi</b>, ketik kunci, lalu pilih atau seret berkas <code>.txt</code>.</li>
   <li>Klik <b>Enkripsi</b> (atau Ctrl/⌘ + Enter), kemudian klik <b>Unduh .txt</b> untuk menyimpan berkas terenkripsi.</li>
   <li>Untuk dekripsi, pilih mode <b>Dekripsi</b>, gunakan kunci yang sama, dan pilih berkas cipherteks.</li>
-  <li>Unit test: <code>npm test</code>. Membuat ulang laporan: <code>npm install</code> lalu <code>npm run report</code>.</li>
+  <li>Unit test dijalankan dengan <code>npm test</code>; laporan dibuat ulang dengan <code>npm install</code> lalu <code>npm run report</code>.</li>
 </ol>
-
-<h2>Lampiran B. Kode Sumber Modul Inti (app/playfair.js)</h2>
-<pre>${esc(code.full)}</pre>
 </section>
 
 </body>
