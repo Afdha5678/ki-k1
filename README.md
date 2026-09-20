@@ -2,12 +2,6 @@
 
 Aplikasi web untuk enkripsi dan dekripsi berkas teks menggunakan **Playfair Cipher**, disertai laporan PDF implementasi.
 
-| Spesifikasi | Lokasi |
-|---|---|
-| Aplikasi program | [`app/`](app/) (buka `app/index.html`) |
-| Masukan: berkas teks asli | [`samples/plainteks.txt`](samples/plainteks.txt) |
-| Keluaran: berkas terenkripsi | [`samples/plainteks-terenkripsi.txt`](samples/plainteks-terenkripsi.txt) |
-| Laporan PDF + screenshot | [`laporan/Laporan-K1-Playfair-Cipher.pdf`](laporan/Laporan-K1-Playfair-Cipher.pdf) |
 
 ## Menjalankan aplikasi
 
