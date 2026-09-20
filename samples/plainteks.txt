@@ -1,4 +1,0 @@
-Keamanan informasi adalah upaya melindungi data dari akses, penggunaan, pengungkapan, dan perubahan oleh pihak yang tidak berwenang.
-Tiga pilar utamanya adalah kerahasiaan, integritas, dan ketersediaan.
-Playfair cipher ditemukan oleh Sir Charles Wheatstone pada tahun 1854 dan dipopulerkan oleh Baron Lyon Playfair.
-Cipher ini mengenkripsi pasangan huruf sehingga analisis frekuensi huruf tunggal menjadi jauh lebih sulit.
