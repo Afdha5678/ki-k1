@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playfair Cipher — Keamanan Informasi</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Floating Header -->
+  <header class="floating-header">
+  <div class="header-brand">
+    <a href="#input-card">PLAYFAIR CIPHER</a>
+    <span>Keamanan Informasi</span>
+  </div>
+  <nav class="header-nav" aria-label="Navigasi utama">
+    <button id="btn-guide" type="button">Panduan</button>
+    <button id="btn-team" type="button">Tim Kami</button>
+  </nav>
+</header>
+  <main class="page">
+
+    <!-- 1. Masukan -->
+    <section class="input-layout">
+      <div class="card input-card" id="input-card">
+        <div class="section-heading">
+          <div class="section-number"> 01 </div>
+          <div>
+            <span class="section-label">START HERE</span>
+            <h2>Masukan</h2>
+          </div>
+        </div>
+
+        <div class="mode-wrapper">
+          <span class="field-label">Mode operasi</span>
+          <div class="segmented" role="radiogroup" aria-label="Mode">
+            <label>
+              <input type="radio" name="mode" value="encrypt" checked>
+              <span>Enkripsi</span>
+            </label>
+            <label>
+              <input type="radio" name="mode" value="decrypt">
+              <span>Dekripsi</span>
+            </label>
+          </div>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Kunci / Passphrase </span>
+          <input id="key" type="text" autocomplete="off" spellcheck="false" placeholder="Contoh: KEAMANAN INFORMASI" >
+          <span class="field-help"> Gunakan kata atau frasa yang mudah diingat sebagai kunci.</span>
+        </label>
+
+        <div class="field">
+          <span class="field-label" id="file-label"> Berkas plainteks (.txt)</span>
+          <label id="dropzone" class="dropzone">
+            <input id="file" type="file" accept=".txt,text/plain" >
+            <div class="upload-icon"> ↑ </div>
+            <strong>Pilih berkas</strong>
+            <span> atau seret &amp; lepas file .txt di sini</span>
+            <span id="file-name" class="file-name">Belum ada berkas dipilih</span>
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="field-label">
+            <span id="text-label">Isi plainteks</span>
+            <small>· bisa diketik atau diedit langsung</small>
+          </span>
+          <textarea id="input" rows="7" spellcheck="false" placeholder="Tulis pesan yang ingin diproses..." ></textarea>
+        </label>
+
+        <div class="options">
+          <label class="field compact">
+            <span class="field-label"> Huruf sisipan </span>
+            <input id="filler" maxlength="1" value="X" >
+          </label>
+          <label class="field compact grow">
+            <span class="field-label"> Format keluaran </span>
+            <select id="grouping">
+              <option value="2"> Per bigram (ZB RS FY …) </option>
+              <option value="5"> Blok 5 huruf (ZBRSF YKUPG …) </option>
+              <option value="0"> Tanpa spasi </option>
+            </select>
+          </label>
+        </div>
+
+        <div id="error" class="alert" role="alert" hidden></div>
+
+        <div class="actions">
+          <button id="btn-process" class="btn primary" type="button"> Enkripsi </button>
+          <button id="btn-sample" class="btn" type="button"> Muat contoh</button>
+          <button id="btn-reset" class="btn ghost" type="button"> Reset</button>
+          <span class="hint"> Ctrl/⌘ + Enter </span>
+        </div>
+      </div>
+
+      <aside class="matrix-column">
+        <div class="card matrix-card">
+          <div class="section-heading compact-heading">
+            <div class="section-number"> 02 </div>
+            <div><span class="section-label">GENERATED KEY</span>
+              <h2>Bujursangkar kunci</h2></div>
+          </div>
+          <div class="square" id="square" aria-label="Bujursangkar kunci 5x5"></div>
+          <p class="caption" id="hl-caption">  &nbsp; </p>
+          <p class="key-info" id="key-info"></p>
+          <div class="matrix-divider"></div>
+          <div class="rules">
+            <div class="rule"><i class="dot src"></i><span>Huruf bigram masukan</span></div>
+            <div class="rule"><i class="dot dst"></i><span>Huruf hasil</span></div>
+            <div class="rule"><i class="dot key"></i><span>Huruf dari kunci</span></div>
+          </div>
+
+          <details class="theory">
+            <summary>Aturan Playfair</summary>
+            <ol>
+              <li>Ganti J dengan I dan buang karakter selain huruf.</li>
+              <li>Tulis pesan per bigram; huruf kembar disisipi X.</li>
+              <li>Jika jumlah huruf ganjil, tambahkan X di akhir.</li>
+              <li><b>Baris sama:</b> geser ke kanan.</li>
+              <li><b>Kolom sama:</b>geser ke bawah.</li>
+              <li><b>Lainnya:</b>gunakan titik sudut persegi panjang.</li>
+            </ol>
+          </details>
+        </div>
+      </aside>
+    </section>
+
+    <!-- 2. Hasil -->
+    <section id="results" class="results-section" hidden >
+      <div class="card result-card">
+        <div class="card-head">
+          <div class="section-heading">
+            <div class="section-number"> 03 </div>
+            <div> <span class="section-label"> OUTPUT </span>
+              <h2 id="output-title"> Cipherteks </h2>
+            </div>
+          </div>
+          <div class="actions tight">
+            <button id="btn-copy" class="btn small" type="button"> Salin </button>
+            <button id="btn-download" class="btn small primary" type="button"> Unduh .txt </button>
+            <button id="btn-swap" class="btn small ghost" type="button"> Gunakan sebagai masukan ⇄</button>
+          </div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="output-wrapper">
+          <textarea id="output" rows="6" readonly spellcheck="false"></textarea>
+        </div>
+        <div id="raw-wrap" class="raw" hidden>
+          <span class="field-label">Hasil mentah sebelum huruf sisipan dibuang</span>
+          <pre id="raw-output" class="mono-box"></pre>
+        </div>
+      </div>
+
+      <!-- 3. Pra-pemrosesan -->
+      <div class="card"> 
+        <div class="card-head">
+          <div class="section-heading">
+            <div class="section-number">04</div>
+            <div><span class="section-label">PREPARATION</span><h2>Pra-pemrosesan</h2></div>
+          </div>
+        </div>
+        <ol class="prep" id="prep"></ol>
+      </div>
+
+      <!-- 4. Proses per bigram -->
+      <div class="card">
+        <div class="card-head">
+          <div class="section-heading">
+            <div class="section-number">05</div>
+            <div><span class="section-label">TRANSFORMATION</span><h2>Proses per bigram</h2>
+            </div>
+          </div>
+          <span class="hint">Tap ke baris untuk melihat posisi pada matrix</span>
+        </div>
+        <div class="table-wrap">
+          <table class="steps">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Bigram</th>
+                <th>Posisi (b,k)</th>
+                <th>Aturan</th>
+                <th>Posisi hasil</th>
+                <th>Hasil</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="steps-body"></tbody>
+          </table>
+        </div>
+        <p id="table-note" class="hint" hidden></p>
+      </div>
+
+      <!-- 5. Frekuensi -->
+      <div class="card">
+        <div class="card-head">
+          <div class="section-heading">
+            <div class="section-number"> 06</div>
+            <div><span class="section-label">ANALYSIS</span><h2>Frekuensi huruf</h2></div>
+          </div>
+          <div class="legend">
+            <span><i class="sw sw-in"></i><span id="legend-in">Plainteks</span></span>
+            <span><i class="sw sw-out"></i><span id="legend-out">Cipherteks</span></span>
+          </div>
+        </div>
+        <div class="histogram" id="histogram"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" class="modal-overlay" hidden>
+
+    <!-- Modal Panduan -->
+    <section id="guide-modal" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="guide-title" hidden>
+      <div class="modal-head">
+        <div>
+          <span class="modal-label">PANDUAN PENGGUNAAN</span>
+          <h2 id="guide-title">Cara menggunakan Playfair Cipher</h2>
+        </div>
+        <button id="close-guide" class="modal-close" type="button" aria-label="Tutup panduan">×</button>
+      </div>
+
+      <div class="guide-grid">
+        <div class="guide-step">
+          <span class="step-number">01</span>
+          <p>Pilih mode <strong>Enkripsi</strong> atau <strong>Dekripsi</strong> sesuai kebutuhan pengolahan pesan.</p>
+        </div>
+        <div class="guide-step">
+          <span class="step-number">02</span>
+          <p>Ketik kata/frasa kunci; matriks bujursangkar 5×5 langsung terbentuk otomatis secara real-time.</p>
+        </div>
+        <div class="guide-step">
+          <span class="step-number">03</span>
+          <p>Pilih atau seret berkas <code>.txt</code> (isinya juga bisa diketik atau diedit langsung).</p>
+        </div>
+        <div class="guide-step">
+          <span class="step-number">04</span>
+          <p>Klik <strong>Enkripsi</strong>/<strong>Dekripsi</strong> (atau tekan <code>Ctrl/⌘ + Enter</code>), lalu unduh berkas <code>.txt</code>.</p>
+        </div>
+      </div>
+
+      <div class="guide-note">
+        <div class="note-icon">ⓘ</div>
+        <div>
+          <strong>CATATAN: CONTOH MATERI KULIAH</strong>
+          <p>Tombol <strong>Muat contoh slide</strong> memuat contoh dari materi kuliah keamanan informasi:</p>
+        </div>
+        <div class="example-box">temui ibu nanti malam → ZB RS FY KU PG LG RK VS NL QV</div>
+      </div>
+    </section>
+
+    <!-- Modal Tim Kami -->
+    <section id="team-modal" class="modal-card team-modal" role="dialog" aria-modal="true" aria-labelledby="team-title" hidden>
+      <div class="modal-head">
+        <div>
+          <h2 id="team-title">Tim Kami</h2>
+          <p>Meet the team behind this project.</p>
+        </div>
+        <button id="close-team" class="modal-close" type="button" aria-label="Tutup tim kami">×</button>
+      </div>
+
+      <div class="team-grid">
+        <div class="member-card"><span class="member-number">01</span><strong>Afdha Auliya Atiq</strong><small>M0403241163</small></div>
+        <div class="member-card"><span class="member-number">02</span><strong>Rendi Ramadana</strong><small>M0403241141</small></div>
+        <div class="member-card"><span class="member-number">03</span><strong>Adzkia Muftia Rahman</strong><small>M0403241153</small></div>
+        <div class="member-card"><span class="member-number">04</span><strong>Keyla Nurul Arafah</strong><small>M0403241059</small></div>
+        <div class="member-card"><span class="member-number">05</span><strong>MUHAMMAD ALIF BAHA BADIUZZAMAN</strong><small>M0403241129</small></div>
+        <div class="member-card"><span class="member-number">06</span><strong>M. Revandi Aridya Pohan</strong><small>M0403241077</small></div>
+        <div class="member-card"><span class="member-number">07</span><strong>Nadine Putri Agustin</strong><small>M0403241041</small></div>
+        <div class="member-card"><span class="member-number">08</span><strong>Naufal Indra Rizky</strong><small>M0403241171</small></div>
+        <div class="member-card"><span class="member-number">09</span><strong>Jeslyn Angelica Widjaja</strong><small>M0403241065</small></div>
+        <div class="member-card"><span class="member-number">10</span><strong>QUINA RIZKY DAE YUENA SIREGAR</strong><small>G6401231013</small></div>
+        <div class="member-card"><span class="member-number">11</span><strong>NAZWA NADYA RAHMA</strong><small>M0403241060</small></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="playfair.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    const modalOverlay = document.getElementById("modal-overlay");
+    const guideModal = document.getElementById("guide-modal");
+    const teamModal = document.getElementById("team-modal");
+    const btnGuide = document.getElementById("btn-guide");
+    const btnTeam = document.getElementById("btn-team");
+    const closeGuide = document.getElementById("close-guide");
+    const closeTeam = document.getElementById("close-team");
+
+    function openModal(modal) {
+      guideModal.hidden = true;
+      teamModal.hidden = true;
+      modalOverlay.hidden = false;
+      modal.hidden = false;
+      document.body.classList.add("modal-open");
+    }
+
+    function closeModal() {
+      modalOverlay.hidden = true;
+      guideModal.hidden = true;
+      teamModal.hidden = true;
+      document.body.classList.remove("modal-open");
+    }
+
+    btnGuide.addEventListener("click", () => openModal(guideModal));
+    btnTeam.addEventListener("click", () => openModal(teamModal));
+    closeGuide.addEventListener("click", closeModal);
+    closeTeam.addEventListener("click", closeModal);
+
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modalOverlay.hidden) closeModal();
+    });
+  </script>
+
+</body>
+</html>
